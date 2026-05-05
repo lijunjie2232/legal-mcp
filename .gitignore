@@ -1,0 +1,21 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# data
+test_json
+data/
+
+# kibana
+./kibana/
+kibana/kibana-9.3.4/config/kibana.yml
+
+
+graph_*
