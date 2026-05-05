@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+.vscode
 
 # Virtual environments
 .venv
@@ -14,8 +15,11 @@ test_json
 data/
 
 # kibana
-./kibana/
-kibana/kibana-9.3.4/config/kibana.yml
+kibana/*
+!kibana/kibana-9.3.4/config/kibana.yml
 
-
+# log
 graph_*
+*.log
+./test_*.json
+node_list.json
