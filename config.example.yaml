@@ -1,0 +1,20 @@
+# -----------------------------------
+# Elasticsearch configuration for legal data import.
+# -----------------------------------
+
+# Elasticsearch connection settings
+es:
+  host: "https://l2533584225-elasticsearch-legal-docs.hf.space"
+  # port: 9200
+  # scheme: "https"
+  user: "llm_searcher"
+  password: "llm_searcher"
+
+# Index settings
+index:
+  name: "legal_documents"
+
+# Log settings
+log:
+  level: "INFO"
+  # file: "/path/to/logfile.log"  # Uncomment to enable file logging
