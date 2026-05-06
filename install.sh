@@ -75,7 +75,7 @@ ask_install_dir() {
         # Check if it's an old legal-mcp installation
         if [ -d "$install_dir/legal-mcp" ] && [ -f "$install_dir/legal-mcp/pyproject.toml" ]; then
             info "Detected old legal-mcp installation"
-            read -p "Update existing installation? (y/n): " update_choice
+            read -p "Update existing installation? (y/N): " update_choice
             if [[ "$update_choice" =~ ^[Yy]$ ]]; then
                 UPDATE_MODE=true
                 info "Will update existing installation"
@@ -142,7 +142,7 @@ clone_or_update_project() {
     if [ "$UPDATE_MODE" = true ] && [ -d "$project_dir/.git" ]; then
         info "Updating existing project..."
         cd "$project_dir"
-        git pull origin main || git pull origin master
+        git pull origin master
         success "Project update completed"
     else
         info "Cloning project..."
@@ -164,14 +164,21 @@ setup_venv_and_install() {
     cd "$PROJECT_DIR"
     
     info "Creating virtual environment..."
-    uv venv --python 3.14 venv
-    
+    if [ ! -d "venv" ]; then
+        uv venv --python 3.14 venv
+    else
+        info "Virtual environment already exists, skipping creation"
+    fi
+
     if [ ! -d "venv" ]; then
         error "Virtual environment creation failed"
         exit 1
+    else
+        success "Virtual environment created/updated: $PROJECT_DIR/venv"
     fi
-    
-    success "Virtual environment created: $PROJECT_DIR/venv"
+
+    info "Activating virtual environment..."
+    source venv/bin/activate
     
     # Get Python interpreter path
     if [ "$OS" = "windows" ]; then
@@ -181,7 +188,7 @@ setup_venv_and_install() {
     fi
     
     info "Installing dependencies..."
-    "$PYTHON_PATH" -m pip install -e . -v
+    uv pip install -e . -v
     
     if [ $? -eq 0 ]; then
         success "Dependencies installed"
@@ -243,11 +250,19 @@ EOF
     echo "  Reinstall dependencies:"
     echo "    $PYTHON_EXEC -m pip install -e ."
     echo ""
+    echo "  Uninstall (remove installation directory):"
+    if [ "$OS" = "windows" ]; then
+        echo "    rmdir /s /q $INSTALL_DIR"
+    else
+        echo "    rm -rf $INSTALL_DIR"
+    fi
+    echo ""
     
     info "Next steps:"
-    echo "  1. Add the above MCP configuration to your MCP client configuration file"
-    echo "  2. Restart MCP client to load new configuration"
-    echo "  3. Start using legal-mcp service"
+    echo "  1. Configure $PROJECT_DIR/config.yaml with your settings"
+    echo "  2. Add the above MCP configuration to your MCP client configuration file"
+    echo "  3. Restart MCP client to load new configuration"
+    echo "  4. Start using legal-mcp service"
     echo ""
     
     success "Enjoy using legal-mcp!"
@@ -274,7 +289,23 @@ main() {
     # 4. Create virtual environment and install dependencies
     setup_venv_and_install
     
-    # 5. Output usage instructions
+    # 5. Copy config file if not exists
+    local config_file="$PROJECT_DIR/config.yaml"
+    local config_example="$PROJECT_DIR/config.example.yaml"
+    
+    if [ ! -f "$config_file" ] && [ -f "$config_example" ]; then
+        info "Copying example configuration file..."
+        cp "$config_example" "$config_file"
+        success "Configuration file created: $config_file"
+        info "Please edit $config_file with your settings"
+    elif [ -f "$config_file" ]; then
+        info "Configuration file already exists: $config_file"
+    else
+        warn "Example configuration file not found: $config_example"
+    fi
+    echo ""
+    
+    # 6. Output usage instructions
     output_usage
 }
 
