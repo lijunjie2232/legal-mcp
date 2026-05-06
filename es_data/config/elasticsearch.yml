@@ -1,0 +1,42 @@
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please consult the documentation for further information on configuration options:
+# https://www.elastic.co/guide/en/elasticsearch/reference/index.html
+
+# ---------------------------------- Cluster -----------------------------------
+cluster.name: "es-cluster"
+
+# ------------------------------------ Node ------------------------------------
+node.name: "es-node-1"
+
+# ----------------------------------- Paths ------------------------------------
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+path.repo: /usr/share/elasticsearch/snapshots
+
+# ---------------------------------- Network -----------------------------------
+network.host: 0.0.0.0
+http.port: 9200
+
+# --------------------------------- Discovery ----------------------------------
+discovery.type: single-node
+
+# --------------------------------- Memory -------------------------------------
+bootstrap.memory_lock: true
+
+# --------------------------------- Various ------------------------------------
+action.destructive_requires_name: false
+
+# --------------------------------- Security -----------------------------------
+xpack.security.enrollment.enabled: true
+
+# 允许跨域访问(方便 Kibana 连接)
+http.cors.enabled: true
+http.cors.allow-origin: "*"
