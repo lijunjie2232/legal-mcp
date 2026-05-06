@@ -84,7 +84,6 @@ index:
 log:
   level: "INFO"
   # file: "/path/to/logfile.log"  # Uncomment to enable file logging
-
 ```
 
 The configuration system uses Pydantic models for validation and supports loading from YAML files. Default values are provided if no config file exists.
@@ -186,6 +185,28 @@ Key design patterns:
 - Structured logging with loguru
 - Type hints throughout the codebase
 
+## Elasticsearch Instance
+
+> ⚠️ **ATTENTION**: The demo API for the legal documents Elasticsearch instance is available at [https://l2533584225-elasticsearch-legal-docs.hf.space](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs). It may go to sleep after 30 minutes of inactivity, so please activate it before use or build your own Elasticsearch instance.
+
+### Create a Private Elasticsearch Instance
+
+To create your own Elasticsearch instance, there are several options:
+
+1. **On Hugging Face** (using free tier): Create a space and upload the [Dockerfile](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile) (the same as the current HF demo).
+
+2. **On a private server**(docker command):
+   ```bash
+   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs lijunjie2232/elasticsearch-legal-docs:latest
+   ```
+3. **On a private server**(Dockerfile):
+   ```bash
+   wget https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile
+   docker build -t elasticsearch-legal-docs:dev .
+   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs elasticsearch-legal-docs:dev
+   ```
+   For other options on running Elasticsearch with Docker, see the [official documentation](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic).
+
 ## Project Structure
 
 ```
@@ -221,24 +242,6 @@ legal-mcp/
 - Elasticsearch 9.3+ (with proper index mapping configured)
 - Virtual environment (recommended)
 - Japanese legal documents in Elasticsearch index
-
-## Elasticsearch Instance
-
-> ⚠️ **ATTENTION**: The demo API for the legal documents Elasticsearch instance is available at [https://l2533584225-elasticsearch-legal-docs.hf.space](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs). It may go to sleep after 30 minutes of inactivity, so please activate it before use or build your own Elasticsearch instance.
-
-### Create a Private Elasticsearch Instance
-
-To create your own Elasticsearch instance, there are several options:
-
-1. **On Hugging Face** (using free tier): Create a space and upload the [Dockerfile](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile) (the same as the current HF demo).
-
-2. **On a private server**:
-   ```bash
-   wget https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile
-   docker build -t elasticsearch-legal-docs:dev .
-   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs elasticsearch-legal-docs:dev
-   ```
-   For other options on running Elasticsearch with Docker, see the [official documentation](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic).
 
 ## License
 

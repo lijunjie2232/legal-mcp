@@ -84,7 +84,6 @@ index:
 log:
   level: "INFO"
   # file: "/path/to/logfile.log"  # ファイルロギングを有効にする場合はコメントアウトを外す
-
 ```
 
 設定システムはPydanticモデルを使用して検証を行い、YAMLファイルからの読み込みをサポートしています。設定ファイルが存在しない場合はデフォルト値が提供されます。
@@ -186,6 +185,30 @@ MCPサーバーは以下のツールを提供します：
 - loguruによる構造化ロギング
 - コードベース全体での型ヒント
 
+## Elasticsearchインスタンス
+
+> ⚠️ **注意**: 法令文書ElasticsearchインスタンスのデモAPIは [https://l2533584225-elasticsearch-legal-docs.hf.space](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs) で利用可能です。30分間非アクティブ状態が続くとスリープ状態になる可能性があるため、使用前にアクティブ化するか、独自のElasticsearchインスタンスを構築してください。
+
+### プライベートElasticsearchインスタンスの作成
+
+独自のElasticsearchインスタンスを作成するには、いくつかのオプションがあります：
+
+1. **Hugging Face上**（無料ティアを使用）: スペースを作成し、[Dockerfile](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile)（現在のHFデモと同じ）をアップロードします。
+
+2. **プライベートサーバー上**(Docker command):
+
+   ```bash
+   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs lijunjie2232/elasticsearch-legal-docs:latest
+   ```
+
+3. **プライベートサーバー上**(Dockerfile):
+   ```bash
+   wget https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile
+   docker build -t elasticsearch-legal-docs:dev .
+   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs elasticsearch-legal-docs:dev
+   ```
+   DockerでElasticsearchを実行する他のオプションについては、[公式ドキュメント](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)を参照してください。
+
 ## プロジェクト構造
 
 ```
@@ -221,24 +244,6 @@ legal-mcp/
 - Elasticsearch 9.3+（適切なインデックスマッピングが設定されていること）
 - 仮想環境（推奨）
 - Elasticsearchインデックス内の日本法令文書
-
-## Elasticsearchインスタンス
-
-> ⚠️ **注意**: 法令文書ElasticsearchインスタンスのデモAPIは [https://l2533584225-elasticsearch-legal-docs.hf.space](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs) で利用可能です。30分間非アクティブ状態が続くとスリープ状態になる可能性があるため、使用前にアクティブ化するか、独自のElasticsearchインスタンスを構築してください。
-
-### プライベートElasticsearchインスタンスの作成
-
-独自のElasticsearchインスタンスを作成するには、いくつかのオプションがあります：
-
-1. **Hugging Face上**（無料ティアを使用）: スペースを作成し、[Dockerfile](https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile)（現在のHFデモと同じ）をアップロードします。
-
-2. **プライベートサーバー上**:
-   ```bash
-   wget https://huggingface.co/spaces/l2533584225/elasticsearch-legal-docs/raw/main/Dockerfile
-   docker build -t elasticsearch-legal-docs:dev .
-   docker run -d -p 9200:9200 -p 9300:9300 --name elasticsearch-legal-docs elasticsearch-legal-docs:dev
-   ```
-   DockerでElasticsearchを実行する他のオプションについては、[公式ドキュメント](https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-docker-basic)を参照してください。
 
 ## ライセンス
 
