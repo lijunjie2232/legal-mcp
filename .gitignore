@@ -10,6 +10,7 @@ wheels/
 # Virtual environments
 .venv
 
+
 # data
 test_json
 data/
@@ -23,3 +24,31 @@ graph_*
 *.log
 test_*.json
 node_list.json
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env.local
+.env.*.local
+config.yaml
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+es_data/data
+es_data/logs
+es_data/log
+es_data/snapshots
+!es_data/config/elasticsearch.yml
+password
