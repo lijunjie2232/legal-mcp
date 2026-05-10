@@ -1,0 +1,24 @@
+{
+  "name": "legal-mcp-server",
+  "version": "1.0.0",
+  "description": "Japanese Legal MCP Server in TypeScript",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.13.1",
+    "@modelcontextprotocol/sdk": "^0.6.0",
+    "js-yaml": "^4.1.0",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  }
+}
