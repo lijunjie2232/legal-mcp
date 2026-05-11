@@ -1,0 +1,140 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 1,
+      "analysis": {
+        "analyzer": {
+          "legal_analyzer": {
+            "type": "kuromoji",
+            "char_filter": [
+              "icu_normalizer"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "law_id": {
+        "type": "keyword"
+      },
+      "file_name": {
+        "type": "keyword"
+      },
+      "indexed_at": {
+        "type": "date"
+      },
+      "schema_version": {
+        "type": "keyword"
+      },
+      "meta": {
+        "properties": {
+          "Era": {
+            "type": "keyword"
+          },
+          "Year": {
+            "type": "integer"
+          },
+          "Num": {
+            "type": "keyword"
+          },
+          "LawType": {
+            "type": "keyword"
+          },
+          "Lang": {
+            "type": "keyword"
+          },
+          "PromulgateMonth": {
+            "type": "integer"
+          },
+          "PromulgateDay": {
+            "type": "integer"
+          },
+          "LawNum": {
+            "type": "keyword"
+          },
+          "LawTitle_Kana": {
+            "type": "keyword"
+          },
+          "LawTitle_Kanji": {
+            "type": "keyword"
+          },
+          "LawTitle_Abbrev": {
+            "type": "keyword"
+          }
+        }
+      },
+      "legal_content": {
+        "properties": {
+          "sentence": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "enact_statement": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "article_caption": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "article_title": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "appdx_table_title": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "fig_struct_title": {
+            "type": "text",
+            "analyzer": "legal_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "raw_full_json": {
+        "type": "object",
+        "enabled": false
+      }
+    }
+  }
+}
