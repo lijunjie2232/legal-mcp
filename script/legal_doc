@@ -1,0 +1,8 @@
+FROM legal-doc-es-dev:0.0.3
+
+# remove all the .lock file under /usr/share/elasticsearch/data recursively
+RUN find /usr/share/elasticsearch/data -name "*.lock" -delete
+
+# health check for elasticsearch
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=60s \
+  CMD curl -I -s http://localhost:9200/ | grep -qE "200 OK|401 Unauthorized" || exit 1
