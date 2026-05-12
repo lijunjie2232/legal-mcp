@@ -75,8 +75,9 @@ class LegalMcpServer {
   }
 
   private setupToolHandlers() {
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+      logger.info('[LegalMCP] === LIST TOOLS REQUEST RECEIVED ===');
+      const tools = [
         {
           name: "search_laws",
           description: "Search for Japanese laws and regulations based on a natural language query.",
@@ -129,30 +130,87 @@ class LegalMcpServer {
             required: ["law_id"],
           },
         },
-      ],
-    }));
+      ];
+      logger.info('[LegalMCP] Returning tools:', {
+        count: tools.length,
+        toolNames: tools.map(t => t.name)
+      });
+      return { tools };
+    });
 
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const toolName = request.params.name;
+      const args = request.params.arguments;
+      
+      logger.info('[LegalMCP] === TOOL CALL REQUEST RECEIVED ===', {
+        toolName,
+        arguments: args,
+        timestamp: new Date().toISOString()
+      });
+      
+      const startTime = Date.now();
+      
       try {
-        switch (request.params.name) {
+        let result;
+        switch (toolName) {
           case "search_laws":
-            return await this.handleSearchLaws(request.params.arguments);
+            result = await this.handleSearchLaws(args);
+            break;
           case "get_law_by_id":
-            return await this.handleGetLawById(request.params.arguments);
+            result = await this.handleGetLawById(args);
+            break;
           case "get_cluster_status":
-            return await this.handleGetClusterStatus();
+            result = await this.handleGetClusterStatus();
+            break;
           case "get_index_state":
-            return await this.handleGetIndexState();
+            result = await this.handleGetIndexState();
+            break;
           case "get_raw_json_by_id":
-            return await this.handleGetRawJsonById(request.params.arguments);
+            result = await this.handleGetRawJsonById(args);
+            break;
           default:
             throw new McpError(
               ErrorCode.MethodNotFound,
-              `Unknown tool: ${request.params.name}`
+              `Unknown tool: ${toolName}`
             );
         }
+        
+        const duration = Date.now() - startTime;
+        
+        logger.info('[LegalMCP] === TOOL CALL COMPLETED ===', {
+          toolName,
+          duration: `${duration}ms`,
+          resultType: typeof result,
+          hasContent: !!result?.content,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Log result preview
+        if (result?.content && Array.isArray(result.content)) {
+          const textContent = result.content
+            .filter((block: any) => block.type === 'text')
+            .map((block: any) => block.text)
+            .join('\n');
+          
+          logger.info('[LegalMCP] Result preview:', {
+            toolName,
+            contentLength: textContent?.length || 0,
+            preview: textContent?.substring(0, 300) + (textContent && textContent.length > 300 ? '...' : '')
+          });
+        }
+        
+        return result;
       } catch (error: any) {
-        logger.error(`Error in ${request.params.name}:`, error);
+        const duration = Date.now() - startTime;
+        
+        logger.error('[LegalMCP] === TOOL CALL FAILED ===', {
+          toolName,
+          error: error.message || String(error),
+          stack: error.stack,
+          duration: `${duration}ms`,
+          timestamp: new Date().toISOString()
+        });
+        
         return {
           content: [
             {
