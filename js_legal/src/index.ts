@@ -21,6 +21,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
       format: winston.format.simple(),
+      stderrLevels: ['info', 'error', 'warn', 'debug'],
     }),
     ...(config.log.file ? [new winston.transports.File({ filename: config.log.file })] : [])
   ],
