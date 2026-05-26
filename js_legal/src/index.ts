@@ -81,32 +81,32 @@ class LegalMcpServer {
       const tools = [
         {
           name: "search_laws",
-          description: "Search for Japanese laws and regulations based on a natural language query.",
+          description: "日本の法令データベースから、正式な条文や法律を検索します。専門的な法的根拠が必要な場合や、正確な法令名・条文を確認したい場合に使用してください。",
           inputSchema: {
             type: "object",
             properties: {
-              query: { type: "string", description: "The search terms (e.g., 'Constitution', 'Tax', 'Data Privacy')." },
-              era: { type: "string", description: "Optional filter for the Japanese Era (e.g., 'Showa', 'Heisei', 'Reiwa')." },
-              law_type: { type: "string", description: "Optional filter for law type (e.g., 'Act', 'CabinetOrder', 'MinisterialOrdinance')." },
-              limit: { type: "number", description: "Maximum number of results to return (default is 5).", default: 5 },
+              query: { type: "string", description: "検索キーワード（例：'憲法', '所得税法', '個人情報保護'）。自然言語での入力も可能です。" },
+              era: { type: "string", description: "日本の元号によるフィルタ（例：'昭和', '平成', '令和'）。" },
+              law_type: { type: "string", description: "法令の種類によるフィルタ（例：'Act'（法律）, 'CabinetOrder'（政令）, 'MinisterialOrdinance'（省令））。" },
+              limit: { type: "number", description: "取得する最大件数（デフォルトは5）。", default: 5 },
             },
             required: ["query"],
           },
         },
         {
           name: "get_law_by_id",
-          description: "Retrieve the full details of a specific law by its ID.",
+          description: "指定された法令IDに基づいて、法令の全文または詳細な情報を取得します。特定の法律の正確な文言を確認する場合に最適です。",
           inputSchema: {
             type: "object",
             properties: {
-              law_id: { type: "string", description: "The unique identifier of the law (e.g., '101AC0000000001')." },
+              law_id: { type: "string", description: "法令のユニークID（例：'101AC0000000001'）。" },
             },
             required: ["law_id"],
           },
         },
         {
           name: "get_cluster_status",
-          description: "Get the current health and status of the legal document database.",
+          description: "法令データベースの稼働状況を確認します。通常、ユーザーへの回答には使用しません。",
           inputSchema: {
             type: "object",
             properties: {},
@@ -114,7 +114,7 @@ class LegalMcpServer {
         },
         {
           name: "get_index_state",
-          description: "Get detailed statistics and settings of the legal documents index.",
+          description: "法令インデックスの統計情報を取得します。通常、ユーザーへの回答には使用しません。",
           inputSchema: {
             type: "object",
             properties: {},
@@ -122,11 +122,11 @@ class LegalMcpServer {
         },
         {
           name: "get_raw_json_by_id",
-          description: "Retrieve the complete raw_full_json data for a specific law by its ID.",
+          description: "指定された法令の未加工のJSONデータを取得します。非常に詳細な構造情報が必要な場合に使用します。",
           inputSchema: {
             type: "object",
             properties: {
-              law_id: { type: "string", description: "The unique identifier of the law (e.g., '101AC0000000001')." },
+              law_id: { type: "string", description: "法令のユニークID。" },
             },
             required: ["law_id"],
           },
@@ -295,15 +295,15 @@ class LegalMcpServer {
     const hits = response.hits.hits;
     if (hits.length === 0) {
       return {
-        content: [{ type: "text", text: "No matching laws found." }],
+        content: [{ type: "text", text: "一致する法令が見つかりませんでした。" }],
       };
     }
 
     const results = hits.map((hit: any) => {
       const source = hit._source;
       const meta = source.meta || {};
-      const title = meta.LawTitle_Kanji || "Unknown Title";
-      const lawNum = meta.LawNum || "Unknown Num";
+      const title = meta.LawTitle_Kanji || "名称不明";
+      const lawNum = meta.LawNum || "番号不明";
       const lawId = source.law_id;
       const highlight = hit.highlight || {};
 
@@ -318,10 +318,10 @@ class LegalMcpServer {
       if (!snippet) {
         const content = source.legal_content || {};
         const sentence = content.sentence || "";
-        snippet = sentence ? (sentence.substring(0, 200) + "...") : "No content available.";
+        snippet = sentence ? (sentence.substring(0, 200) + "...") : "内容なし";
       }
 
-      return `ID: ${lawId}\nTitle: ${title}\nLaw Number: ${lawNum}\nSnippet: ${snippet}\n---`;
+      return `ID: ${lawId}\nタイトル: ${title}\n法令番号: ${lawNum}\n内容抜粋: ${snippet}\n---`;
     });
 
     return {
@@ -343,17 +343,23 @@ class LegalMcpServer {
     const content = source.legal_content || {};
 
     const output = [
-      `# ${meta.LawTitle_Kanji || "Unknown Law"}`,
+      `# ${meta.LawTitle_Kanji || "名称不明"}`,
       `ID: ${law_id}`,
-      `Law Number: ${meta.LawNum}`,
-      `Type: ${meta.LawType}`,
-      `Era: ${meta.Era} ${meta.Year}`,
-      "\n## Legal Content\n",
+      `法令番号: ${meta.LawNum}`,
+      `種別: ${meta.LawType}`,
+      `制定時期: ${meta.Era} ${meta.Year}`,
+      "\n## 法令内容\n",
     ];
 
     for (const field of ["article_title", "article_caption", "sentence", "enact_statement"]) {
       if (content[field]) {
-        output.push(`### ${field.split("_").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ")}`);
+        const labels: { [key: string]: string } = {
+          article_title: "条文タイトル",
+          article_caption: "条文見出し",
+          sentence: "本文",
+          enact_statement: "制定文"
+        };
+        output.push(`### ${labels[field] || field}`);
         output.push(content[field]);
         output.push("");
       }
@@ -361,7 +367,7 @@ class LegalMcpServer {
 
     const raw = source.raw_full_json || {};
     if (raw.omitted) {
-      output.push("\n*Note: Full raw JSON structure was omitted for this document due to size.*");
+      output.push("\n*注: このドキュメントの完全なRaw JSON構造は、サイズ制限のため省略されました。*");
     }
 
     return {
